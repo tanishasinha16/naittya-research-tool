@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>नैत्य — Research Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ══ PHYSIO THEME (dark) ══ */
+    :root, .t-physio {
+      --bg:        #0A0F1E;
+      --bg2:       #0C1020;
+      --surface:   rgba(255,255,255,0.04);
+      --accent:    #00C49A;
+      --accent-g:  rgba(0,196,154,0.13);
+      --accent-b:  rgba(0,196,154,0.25);
+      --text:      #F0F4FF;
+      --muted:     #8B9CC8;
+      --border:    rgba(255,255,255,0.08);
+      --card:      rgba(255,255,255,0.04);
+      --danger:    #F87171;
+      --amber:     #FBBF24;
+      --green:     #34D399;
+      --tag-text:  #00C49A;
+      --tag-bg:    rgba(0,196,154,0.13);
+      --tag-border:rgba(0,196,154,0.25);
+      --top-bg:    rgba(10,15,30,0.88);
+      --tab-bg:    rgba(10,15,30,0.96);
+      --pain-num:  #F87171;
+      --hook-bg:   linear-gradient(155deg,#060A15,#0A1428);
+      --sol-bg:    linear-gradient(155deg,#060D18,#081A15);
+      --dash-bg:   #0C1020;
+      --sum-bg:    linear-gradient(155deg,#0A0F1E,#081A15);
+      --inp-bg:    rgba(255,255,255,0.04);
+      --inp-focus: rgba(0,196,154,0.35);
+      --annual-bg: linear-gradient(135deg,#063D30,#0A1428);
+      --annual-bc: rgba(0,196,154,0.2);
+      --res-hl-bg: rgba(0,196,154,0.05);
+      --res-hl-bc: rgba(0,196,154,0.22);
+      --sel-card:  rgba(255,255,255,0.05);
+      --sel-hover: rgba(255,255,255,0.09);
+      --shadow:    none;
+    }
+
+    /* ══ DERM THEME (light fresh) ══ */
+    .t-derm {
+      --bg:        #F4F6FD;
+      --bg2:       #ECEFFE;
+      --surface:   rgba(255,255,255,0.9);
+      --accent:    #5C6FE0;
+      --accent-g:  rgba(92,111,224,0.1);
+      --accent-b:  rgba(92,111,224,0.3);
+      --text:      #1A2540;
+      --muted:     #6B7FA3;
+      --border:    rgba(26,37,64,0.1);
+      --card:      rgba(255,255,255,0.85);
+      --danger:    #E55A6F;
+      --amber:     #E8931A;
+      --green:     #1BAE70;
+      --tag-text:  #5C6FE0;
+      --tag-bg:    rgba(92,111,224,0.1);
+      --tag-border:rgba(92,111,224,0.3);
+      --top-bg:    rgba(244,246,253,0.92);
+      --tab-bg:    rgba(255,255,255,0.96);
+      --pain-num:  #E55A6F;
+      --hook-bg:   linear-gradient(155deg,#EEF1FB,#F4F6FD);
+      --sol-bg:    linear-gradient(155deg,#EEF3FF,#EDF9F5);
+      --dash-bg:   #EFF1FA;
+      --sum-bg:    linear-gradient(155deg,#F4F6FD,#EDF9F4);
+      --inp-bg:    rgba(255,255,255,0.9);
+      --inp-focus: rgba(92,111,224,0.4);
+      --annual-bg: linear-gradient(135deg,#EAF0FF,#EDF9F4);
+      --annual-bc: rgba(92,111,224,0.25);
+      --res-hl-bg: rgba(92,111,224,0.05);
+      --res-hl-bc: rgba(92,111,224,0.22);
+      --sel-card:  rgba(92,111,224,0.07);
+      --sel-hover: rgba(92,111,224,0.13);
+      --shadow:    0 4px 24px rgba(26,37,64,0.08);
+    }
+
+    html, body {
+      width:100%; height:100%; overflow:hidden;
+      background:var(--bg); color:var(--text);
+      font-family:'Inter',sans-serif;
+      transition: background 0.4s, color 0.4s;
+    }
+    h1,h2,h3,h4 { font-family:'Plus Jakarta Sans',sans-serif; line-height:1.2; }
+
+    :root {
+      --tab-h: 72px;
+      --top-h: 60px;
+    }
+
+    /* ════════════════════════════
+       SELECTION SCREEN
+    ════════════════════════════ */
+    #selectScreen {
+      position:fixed; inset:0; z-index:500;
+      background:linear-gradient(155deg,#060A15 0%,#0A1428 100%);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:40px 32px;
+      transition:opacity 0.4s, transform 0.4s;
+    }
+    #selectScreen.out {
+      opacity:0; transform:scale(0.97); pointer-events:none;
+    }
+    .sel-logo {
+      display:flex; align-items:center; gap:10px;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:20px; font-weight:800; color:#F0F4FF;
+      margin-bottom:48px;
+    }
+    .sel-logo-icon {
+      width:32px; height:32px; background:#00C49A;
+      border-radius:9px; display:flex; align-items:center; justify-content:center;
+    }
+    .sel-logo-icon svg { width:16px; height:16px; }
+    .sel-prompt {
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:clamp(22px,4vw,30px); font-weight:800;
+      color:#F0F4FF; margin-bottom:8px; text-align:center;
+    }
+    .sel-sub {
+      font-size:15px; color:#8B9CC8; margin-bottom:40px; text-align:center;
+    }
+    .sel-cards {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:18px; width:100%; max-width:640px;
+    }
+    .sel-card {
+      border-radius:22px; padding:32px 24px;
+      cursor:pointer; display:flex; flex-direction:column;
+      align-items:center; text-align:center;
+      transition:transform 0.2s, box-shadow 0.2s;
+      -webkit-tap-highlight-color:transparent;
+      border:1.5px solid rgba(255,255,255,0.1);
+    }
+    .sel-card:hover  { transform:translateY(-4px); }
+    .sel-card:active { transform:scale(0.97); }
+
+    /* Physio card — dark */
+    .sel-card.physio {
+      background:rgba(0,196,154,0.08);
+      border-color:rgba(0,196,154,0.25);
+    }
+    .sel-card.physio:hover { box-shadow:0 16px 48px rgba(0,196,154,0.15); border-color:rgba(0,196,154,0.45); }
+    .sel-icon-physio {
+      width:64px; height:64px; border-radius:18px;
+      background:rgba(0,196,154,0.15); border:1.5px solid rgba(0,196,154,0.3);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:18px;
+    }
+    .sel-icon-physio svg { width:32px; height:32px; color:#00C49A; }
+    .sel-card.physio h3 { font-size:18px; font-weight:800; color:#F0F4FF; margin-bottom:8px; }
+    .sel-card.physio p  { font-size:13px; color:#8B9CC8; line-height:1.55; }
+
+    /* Derm card — light fresh preview */
+    .sel-card.derm {
+      background:rgba(255,255,255,0.08);
+      border-color:rgba(92,111,224,0.3);
+    }
+    .sel-card.derm:hover { box-shadow:0 16px 48px rgba(92,111,224,0.2); border-color:rgba(92,111,224,0.5); }
+    .sel-icon-derm {
+      width:64px; height:64px; border-radius:18px;
+      background:rgba(92,111,224,0.15); border:1.5px solid rgba(92,111,224,0.35);
+      display:flex; align-items:center; justify-content:center;
+      margin-bottom:18px;
+    }
+    .sel-icon-derm svg { width:32px; height:32px; color:#818CF8; }
+    .sel-card.derm h3 { font-size:18px; font-weight:800; color:#F0F4FF; margin-bottom:8px; }
+    .sel-card.derm p  { font-size:13px; color:#8B9CC8; line-height:1.55; }
+
+    /* ════════════════════════════
+       MAIN TOOL
+    ════════════════════════════ */
+    #mainTool {
+      display:none; width:100%; height:100%;
+    }
+    #mainTool.visible { display:block; }
+
+    /* TOP BAR */
+    .topbar {
+      position:fixed; top:0; left:0; right:0;
+      height:var(--top-h); z-index:80;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 22px;
+      background:var(--top-bg);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--border);
+      transition:background 0.4s, border-color 0.4s;
+    }
+    .logo {
+      display:flex; align-items:center; gap:9px;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:17px; font-weight:800; color:var(--text);
+      cursor:pointer;
+    }
+    .logo-icon {
+      width:28px; height:28px; background:var(--accent);
+      border-radius:7px; display:flex; align-items:center; justify-content:center;
+    }
+    .logo-icon svg { width:14px; height:14px; }
+    .logo-icon svg.physio-icon { stroke:#0A0F1E; }
+    .logo-icon svg.derm-icon   { stroke:#FFFFFF; }
+
+    .topbar-mid { display:flex; align-items:center; gap:8px; }
+    .prog-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:var(--border); border:1px solid rgba(128,128,128,0.2);
+      transition:background 0.3s, transform 0.3s;
+    }
+    .prog-dot.active  { background:var(--accent); transform:scale(1.35); }
+    .prog-dot.visited { background:var(--accent-g); border-color:var(--accent-b); }
+    .slide-ctr { font-size:13px; color:var(--muted); font-weight:500; min-width:36px; text-align:right; }
+
+    .sp-badge {
+      font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+      padding:4px 12px; border-radius:100px;
+      background:var(--accent-g); color:var(--accent);
+      border:1px solid var(--accent-b);
+    }
+
+    .history-btn {
+      display:flex; align-items:center; gap:6px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:9px; padding:7px 12px;
+      font-size:12px; font-weight:600; color:var(--muted);
+      cursor:pointer; transition:all 0.2s;
+    }
+    .history-btn:hover { color:var(--text); }
+    .history-btn svg { width:13px; height:13px; }
+    .h-count {
+      background:var(--accent); color:#fff;
+      font-size:10px; font-weight:800;
+      width:16px; height:16px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .t-physio .h-count { color:#0A0F1E; }
+
+    /* CONTENT */
+    .content {
+      position:fixed;
+      top:var(--top-h); left:0; right:0; bottom:var(--tab-h);
+      overflow:hidden;
+    }
+
+    /* TAB BAR */
+    .tabbar {
+      position:fixed; bottom:0; left:0; right:0;
+      height:var(--tab-h);
+      background:var(--tab-bg);
+      backdrop-filter:blur(16px);
+      border-top:1px solid var(--border);
+      display:flex; z-index:80;
+      transition:background 0.4s, border-color 0.4s;
+    }
+    .tab-btn {
+      flex:1; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:5px;
+      border:none; background:transparent; color:var(--muted);
+      cursor:pointer;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:12px; font-weight:700;
+      transition:color 0.2s; position:relative;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .tab-btn svg { width:22px; height:22px; }
+    .tab-btn.active { color:var(--accent); }
+    .tab-btn.active::before {
+      content:''; position:absolute; top:0; left:20%; right:20%;
+      height:2px; border-radius:0 0 4px 4px; background:var(--accent);
+    }
+    .tab-divider { width:1px; background:var(--border); margin:14px 0; }
+
+    /* NAV ARROWS */
+    .nav-arr {
+      position:fixed; bottom:calc(var(--tab-h) + 14px); z-index:90;
+      width:48px; height:48px; border-radius:50%;
+      border:1px solid var(--border);
+      background:var(--surface); backdrop-filter:blur(8px);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text);
+      transition:all 0.2s; box-shadow:var(--shadow);
+      -webkit-tap-highlight-color:transparent;
+    }
+    .nav-arr svg { width:18px; height:18px; }
+    .nav-arr.prev { left:18px; }
+    .nav-arr.next { right:18px; background:var(--accent); border-color:var(--accent); color:#fff; }
+    .t-physio .nav-arr.next { color:#0A0F1E; }
+    .nav-arr.next:hover { opacity:0.88; }
+    .nav-arr:disabled { opacity:0.2; pointer-events:none; }
+    .nav-arr.hidden { display:none; }
+
+    /* TAG */
+    .tag {
+      display:inline-block; font-size:11px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase;
+      color:var(--tag-text); background:var(--tag-bg);
+      border:1px solid var(--tag-border);
+      border-radius:100px; padding:5px 15px; margin-bottom:18px;
+    }
+
+    /* ════════════════════════════
+       DECK
+    ════════════════════════════ */
+    #deckView { width:100%; height:100%; overflow:hidden; }
+    .deck {
+      display:flex; height:100%;
+      transition:transform 0.42s cubic-bezier(0.4,0,0.2,1);
+    }
+    .slide {
+      flex:0 0 100vw; width:100vw; height:100%;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:28px 34px; position:relative; overflow:hidden;
+    }
+    .s-hook  { background:var(--hook-bg); }
+    .s-pain  { background:var(--bg); }
+    .s-sol   { background:var(--sol-bg); }
+    .s-dash  { background:var(--dash-bg); }
+    .s-sum   { background:var(--sum-bg); justify-content:flex-start; padding-top:18px; overflow-y:auto; }
+
+    /* grid lines on hook for physio */
+    .t-physio .s-hook::before {
+      content:''; position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+      background-size:52px 52px;
+    }
+    /* subtle dots for derm hook */
+    .t-derm .s-hook::before {
+      content:''; position:absolute; inset:0;
+      background-image:radial-gradient(circle, rgba(92,111,224,0.08) 1px, transparent 1px);
+      background-size:32px 32px;
+    }
+
+    .glow { position:absolute; border-radius:50%; filter:blur(70px); pointer-events:none; }
+
+    /* Hook */
+    .hook-stat {
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:clamp(72px,16vw,130px); font-weight:800; line-height:1;
+      background:linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; margin-bottom:14px;
+    }
+    .hook-label {
+      font-size:clamp(17px,3vw,24px); color:var(--muted);
+      line-height:1.45; text-align:center; max-width:480px;
+    }
+    .hook-label strong { color:var(--text); font-weight:700; }
+
+    /* Pain */
+    .pain-num { font-size:12px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--pain-num); margin-bottom:14px; }
+    .pain-h   { font-size:clamp(24px,5vw,40px); font-weight:800; line-height:1.15; margin-bottom:14px; text-align:center; max-width:540px; }
+    .pain-sub { font-size:clamp(13px,2vw,16px); color:var(--muted); line-height:1.65; text-align:center; max-width:480px; margin-bottom:36px; }
+
+    /* Score widget */
+    .score-wrap { display:flex; flex-direction:column; align-items:center; gap:10px; }
+    .score-lbl  { font-size:11px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.1em; }
+    .score-dots { display:flex; gap:12px; }
+    .sdot {
+      width:52px; height:52px; border-radius:50%;
+      border:2px solid var(--border);
+      background:var(--surface);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:18px; font-weight:700; color:var(--muted);
+      cursor:pointer; transition:all 0.18s;
+      -webkit-tap-highlight-color:transparent;
+      box-shadow:var(--shadow);
+    }
+    .sdot:hover { border-color:rgba(128,128,128,0.3); color:var(--text); }
+    .sdot.lo { background:rgba(229,90,111,0.15); border-color:var(--danger); color:var(--danger); transform:scale(1.12); }
+    .sdot.mi { background:rgba(232,147,26,0.13); border-color:var(--amber);  color:var(--amber);  transform:scale(1.12); }
+    .sdot.hi { background:var(--accent-g);        border-color:var(--accent); color:var(--accent); transform:scale(1.12); }
+    .score-hint { display:flex; justify-content:space-between; width:300px; font-size:11px; color:var(--muted); }
+
+    /* Solution */
+    .sol-steps { display:flex; flex-direction:column; gap:12px; width:100%; max-width:520px; }
+    .sol-step {
+      display:flex; align-items:flex-start; gap:14px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:14px; padding:15px 18px;
+      box-shadow:var(--shadow);
+    }
+    .sol-icon {
+      width:38px; height:38px; flex-shrink:0;
+      background:var(--accent-g); border:1px solid var(--accent-b);
+      border-radius:11px; display:flex; align-items:center; justify-content:center;
+    }
+    .sol-icon svg { width:18px; height:18px; color:var(--accent); }
+    .sol-step h4 { font-size:14px; font-weight:700; margin-bottom:3px; color:var(--text); }
+    .sol-step p  { font-size:13px; color:var(--muted); line-height:1.5; }
+
+    /* Dashboard mockup */
+    .mini-dash {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; padding:18px; width:100%; max-width:560px;
+      box-shadow:var(--shadow);
+    }
+    .md-hdr {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:13px; padding-bottom:12px; border-bottom:1px solid var(--border);
+    }
+    .md-title { font-size:13px; font-weight:700; color:var(--text); }
+    .live-dot { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--accent); font-weight:600; }
+    .live-dot span { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .md-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:12px; }
+    .md-kpi  { background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:11px 10px; text-align:center; }
+    .md-kpi-v { font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; font-weight:700; margin-bottom:2px; }
+    .md-kpi-l { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.07em; }
+    .p-list { display:flex; flex-direction:column; gap:7px; }
+    .p-row  { display:flex; align-items:center; gap:10px; padding:9px 11px; background:var(--surface); border-radius:9px; border:1px solid var(--border); }
+    .p-av   { width:30px; height:30px; border-radius:50%; background:var(--accent-g); color:var(--accent); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .p-nm   { font-size:12px; font-weight:600; flex:1; color:var(--text); }
+    .p-sp   { font-size:11px; color:var(--muted); }
+    .pb     { font-size:10px; font-weight:600; padding:2px 9px; border-radius:100px; }
+    .pg     { background:rgba(27,174,112,0.13); color:var(--green); }
+    .pa     { background:rgba(232,147,26,0.13);  color:var(--amber); }
+    .pr     { background:rgba(229,90,111,0.13);  color:var(--danger); }
+
+    /* Summary */
+    .sum-grid { display:flex; flex-direction:column; gap:10px; width:100%; max-width:480px; margin-bottom:18px; }
+    .sum-row  {
+      display:flex; align-items:center; gap:14px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:13px; padding:12px 15px; box-shadow:var(--shadow);
+    }
+    .sum-lbl { flex:1; font-size:13px; font-weight:600; color:var(--text); }
+    .sum-pips { display:flex; gap:5px; }
+    .pip {
+      width:26px; height:26px; border-radius:7px;
+      background:var(--surface); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:var(--muted);
+    }
+    .pip.plo { background:rgba(229,90,111,0.14); border-color:var(--danger); color:var(--danger); }
+    .pip.pmi { background:rgba(232,147,26,0.14);  border-color:var(--amber);  color:var(--amber); }
+    .pip.phi { background:var(--accent-g);         border-color:var(--accent); color:var(--accent); }
+
+    .inp-wrap { width:100%; max-width:480px; margin-bottom:13px; }
+    .inp-wrap label { display:block; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px; }
+    .inp-wrap input, .inp-wrap textarea {
+      width:100%; background:var(--inp-bg); border:1px solid var(--border);
+      border-radius:11px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:15px; padding:11px 14px; outline:none; resize:none;
+      transition:border-color .2s; box-shadow:var(--shadow);
+    }
+    .inp-wrap input:focus,.inp-wrap textarea:focus { border-color:var(--inp-focus); }
+    .inp-wrap textarea { height:62px; }
+    .btn-save {
+      display:flex; align-items:center; gap:9px;
+      background:var(--accent); color:#fff;
+      font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:14px;
+      padding:13px 26px; border-radius:11px; border:none; cursor:pointer;
+      transition:opacity .2s, transform .15s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .t-physio .btn-save { color:#0A0F1E; }
+    .btn-save:hover { opacity:0.88; transform:translateY(-1px); }
+    .btn-save svg { width:16px; height:16px; }
+    .save-ok { display:none; align-items:center; gap:7px; color:var(--accent); font-weight:600; font-size:14px; margin-top:10px; }
+    .save-ok.show { display:flex; }
+
+    /* ════════════════════════════
+       ROI VIEW
+    ════════════════════════════ */
+    #roiView {
+      width:100%; height:100%; overflow-y:auto;
+      padding:22px 22px 16px; display:none;
+    }
+    #roiView.active { display:block; }
+
+    .roi-hdr { text-align:center; margin-bottom:20px; }
+    .roi-hdr h2 { font-size:clamp(20px,4vw,28px); font-weight:800; letter-spacing:-.02em; margin-bottom:5px; color:var(--text); }
+    .roi-hdr p  { font-size:13px; color:var(--muted); }
+
+    /* Clinic name at top of ROI */
+    .roi-clinic-wrap {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:18px 20px; margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
+    .roi-clinic-wrap label {
+      display:block; font-size:11px; font-weight:700; color:var(--muted);
+      text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px;
+    }
+    .roi-clinic-wrap input {
+      width:100%; background:var(--inp-bg); border:1px solid var(--border);
+      border-radius:10px; color:var(--text); font-family:'Inter',sans-serif;
+      font-size:15px; font-weight:600; padding:11px 14px; outline:none;
+      transition:border-color .2s;
+    }
+    .roi-clinic-wrap input:focus { border-color:var(--inp-focus); }
+    .roi-clinic-note { font-size:11px; color:var(--muted); margin-top:7px; }
+
+    /* Specialty toggle */
+    .sp-toggle {
+      display:flex; gap:6px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:5px;
+      width:fit-content; margin:0 auto 18px;
+      box-shadow:var(--shadow);
+    }
+    .sp-btn {
+      padding:9px 22px; border-radius:9px; border:none;
+      font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:700;
+      cursor:pointer; color:var(--muted); background:transparent;
+      transition:all .22s; -webkit-tap-highlight-color:transparent;
+    }
+    .sp-btn.active { background:var(--accent); color:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.15); }
+    .t-physio .sp-btn.active { color:#0A0F1E; }
+    .sp-btn:not(.active):hover { color:var(--text); }
+
+    .calc-wrap { display:flex; flex-direction:column; gap:14px; }
+
+    .inputs-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; padding:20px 22px; box-shadow:var(--shadow);
+    }
+    .inputs-card h3 { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:18px; }
+
+    .sl-group { margin-bottom:18px; }
+    .sl-group:last-child { margin-bottom:0; }
+    .sl-hdr { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:3px; }
+    .sl-label { font-size:13px; font-weight:600; color:var(--text); }
+    .sl-val   { font-family:'Plus Jakarta Sans',sans-serif; font-size:18px; font-weight:800; color:var(--accent); }
+    .sl-hint  { font-size:11px; color:var(--muted); margin-bottom:7px; }
+
+    input[type=range] {
+      width:100%; -webkit-appearance:none; height:4px; border-radius:4px;
+      background:linear-gradient(to right, var(--accent) var(--pct,50%), var(--border) var(--pct,50%));
+      outline:none; cursor:pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+      background:var(--accent); border:3px solid var(--bg);
+      box-shadow:0 0 0 2px var(--accent); cursor:pointer;
+    }
+    .sl-bounds { display:flex; justify-content:space-between; font-size:10px; color:var(--muted); margin-top:4px; }
+
+    /* Result cards */
+    .results-stack { display:flex; flex-direction:column; gap:12px; }
+    .res-card {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:17px 20px; box-shadow:var(--shadow);
+    }
+    .res-card.hl { background:var(--res-hl-bg); border-color:var(--res-hl-bc); }
+    .res-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); margin-bottom:6px; }
+    .res-val {
+      font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:clamp(26px,5.5vw,36px); font-weight:800; letter-spacing:-.02em; line-height:1; margin-bottom:5px;
+    }
+    .res-val.teal  { color:var(--accent); }
+    .res-val.amber { color:var(--amber); }
+    .res-val.white { color:var(--text); }
+    .res-sub { font-size:12px; color:var(--muted); line-height:1.55; }
+    .breakdown { margin-top:11px; padding-top:11px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:7px; }
+    .brow { display:flex; justify-content:space-between; font-size:12px; }
+    .brow span:first-child { color:var(--muted); }
+    .brow span:last-child  { font-weight:600; color:var(--text); }
+
+    .annual-bar {
+      background:var(--annual-bg); border:1px solid var(--annual-bc);
+      border-radius:16px; padding:18px 22px;
+      display:flex; justify-content:space-between; align-items:center; gap:14px;
+    }
+    .annual-bar .big { font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(26px,6vw,40px); font-weight:800; color:var(--accent); letter-spacing:-.02em; margin-top:3px; }
+    .annual-bar-right { text-align:right; }
+    .annual-bar-right p { font-size:12px; color:var(--muted); }
+    .annual-bar-right strong { font-size:15px; font-weight:700; color:var(--text); }
+
+    .copy-btn {
+      width:100%; display:flex; align-items:center; justify-content:center; gap:8px;
+      background:transparent; border:1px solid var(--border);
+      color:var(--muted); font-family:'Plus Jakarta Sans',sans-serif;
+      font-size:13px; font-weight:600; padding:12px;
+      border-radius:11px; cursor:pointer; transition:all .2s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .copy-btn:hover { color:var(--text); border-color:var(--accent); }
+    .copy-btn svg { width:14px; height:14px; }
+
+    .assumptions {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:13px; padding:13px 16px;
+      font-size:11px; color:var(--muted); line-height:1.7;
+    }
+    .assumptions strong { color:var(--text); }
+
+    /* ════════════════════════════
+       HISTORY PANEL
+    ════════════════════════════ */
+    .history-panel {
+      position:fixed; inset:0; z-index:200;
+      background:rgba(10,15,30,0.92); backdrop-filter:blur(16px);
+      display:none; flex-direction:column; padding:26px 22px; overflow-y:auto;
+    }
+    .t-derm .history-panel { background:rgba(244,246,253,0.96); }
+    .history-panel.open { display:flex; }
+    .hp-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:22px; }
+    .hp-hdr h2 { font-size:20px; font-weight:800; color:var(--text); }
+    .close-btn {
+      width:34px; height:34px; border-radius:50%;
+      background:var(--surface); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--muted);
+    }
+    .close-btn svg { width:15px; height:15px; }
+    .h-table { width:100%; border-collapse:collapse; }
+    .h-table th { text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); padding:8px 11px; border-bottom:1px solid var(--border); }
+    .h-table td { padding:11px 11px; border-bottom:1px solid var(--border); font-size:13px; color:var(--text); }
+    .schip { display:inline-flex; align-items:center; justify-content:center; width:25px; height:25px; border-radius:7px; font-size:12px; font-weight:700; }
+    .sc-lo { background:rgba(229,90,111,0.14);  color:var(--danger); }
+    .sc-mi { background:rgba(232,147,26,0.14);   color:var(--amber); }
+    .sc-hi { background:var(--accent-g);          color:var(--accent); }
+    .empty-h { text-align:center; padding:48px 20px; color:var(--muted); font-size:14px; }
+    .clear-btn { margin-top:22px; background:transparent; border:1px solid rgba(229,90,111,0.3); color:var(--danger); border-radius:10px; padding:9px 18px; font-size:12px; font-weight:600; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     SELECTION SCREEN
+══════════════════════════════ -->
+<div id="selectScreen">
+  <div class="sel-logo">
+    <div class="sel-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0A0F1E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    नैत्य
+  </div>
+  <div class="sel-prompt">Who are you meeting today?</div>
+  <div class="sel-sub">Select a specialty to load the right questions and ROI model.</div>
+  <div class="sel-cards">
+
+    <div class="sel-card physio" onclick="chooseSpecialty('physio')">
+      <div class="sel-icon-physio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M18 12l2 2-2 2"/></svg>
+      </div>
+      <h3>Physiotherapy</h3>
+      <p>Home exercise adherence, session completion, pain score tracking</p>
+    </div>
+
+    <div class="sel-card derm" onclick="chooseSpecialty('derm')">
+      <div class="sel-icon-derm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
+      </div>
+      <h3>Dermatology</h3>
+      <p>Topical regime adherence, photo logging, protocol completion tracking</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MAIN TOOL
+══════════════════════════════ -->
+<div id="mainTool">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo" onclick="backToSelect()">
+      <div class="logo-icon">
+        <svg class="physio-icon" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      नैत्य
+    </div>
+    <div class="topbar-mid" id="deckTop">
+      <div id="progDots" style="display:flex;gap:6px;align-items:center;"></div>
+      <span class="slide-ctr" id="slideCtr">1 / 7</span>
+    </div>
+    <div class="topbar-mid" id="roiTop" style="display:none">
+      <span class="sp-badge" id="roiSpBadge">Physiotherapy</span>
+    </div>
+    <button class="history-btn" onclick="openHist()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Clinics
+      <span class="h-count" id="hCount">0</span>
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- DECK VIEW -->
+    <div id="deckView">
+      <div class="deck" id="deck">
+
+        <!-- Slide 1: Hook -->
+        <div class="slide s-hook">
+          <div class="glow" id="g1" style="width:350px;height:350px;top:-50px;right:-60px;"></div>
+          <div class="glow" id="g2" style="width:260px;height:260px;bottom:-30px;left:-30px;"></div>
+          <div class="tag" id="hookTag">Physiotherapy Research</div>
+          <div class="hook-stat">30–50%</div>
+          <div class="hook-label" id="hookLabel">
+            of your patients stop their home exercise programme<br/>
+            <strong>before they fully recover.</strong>
+          </div>
+        </div>
+
+        <!-- Slide 2: Pain 1 -->
+        <div class="slide s-pain">
+          <div class="pain-num">Pain Point 1 of 3</div>
+          <h2 class="pain-h" id="p1h">Patients stop exercising.<br/>You're the last to know.</h2>
+          <p class="pain-sub" id="p1s">You prescribe a home programme after every session. By day 10, most patients have quietly stopped — and you won't find out until they plateau or don't rebook.</p>
+          <div class="score-wrap">
+            <div class="score-lbl">How much of a problem is this for your clinic?</div>
+            <div class="score-dots" id="sc1">
+              <div class="sdot" onclick="setScore(1,1)">1</div>
+              <div class="sdot" onclick="setScore(1,2)">2</div>
+              <div class="sdot" onclick="setScore(1,3)">3</div>
+              <div class="sdot" onclick="setScore(1,4)">4</div>
+              <div class="sdot" onclick="setScore(1,5)">5</div>
+            </div>
+            <div class="score-hint"><span>Not really</span><span>Massive problem</span></div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Pain 2 -->
+        <div class="slide s-pain">
+          <div class="pain-num">Pain Point 2 of 3</div>
+          <h2 class="pain-h" id="p2h">No visibility<br/>between sessions.</h2>
+          <p class="pain-sub" id="p2s">There's no way to know which patients are at risk until they stop improving — or stop rebooking. By then, the window to intervene has closed.</p>
+          <div class="score-wrap">
+            <div class="score-lbl">How much of a problem is this for your clinic?</div>
+            <div class="score-dots" id="sc2">
+              <div class="sdot" onclick="setScore(2,1)">1</div>
+              <div class="sdot" onclick="setScore(2,2)">2</div>
+              <div class="sdot" onclick="setScore(2,3)">3</div>
+              <div class="sdot" onclick="setScore(2,4)">4</div>
+              <div class="sdot" onclick="setScore(2,5)">5</div>
+            </div>
+            <div class="score-hint"><span>Not really</span><span>Massive problem</span></div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Pain 3 -->
+        <div class="slide s-pain">
+          <div class="pain-num">Pain Point 3 of 3</div>
+          <h2 class="pain-h" id="p3h">Manual follow-up is<br/>eating your team's time.</h2>
+          <p class="pain-sub" id="p3s">WhatsApp reminders sent one by one. No record of who responded or who's actually doing the work. There's no way to scale this.</p>
+          <div class="score-wrap">
+            <div class="score-lbl">How much of a problem is this for your clinic?</div>
+            <div class="score-dots" id="sc3">
+              <div class="sdot" onclick="setScore(3,1)">1</div>
+              <div class="sdot" onclick="setScore(3,2)">2</div>
+              <div class="sdot" onclick="setScore(3,3)">3</div>
+              <div class="sdot" onclick="setScore(3,4)">4</div>
+              <div class="sdot" onclick="setScore(3,5)">5</div>
+            </div>
+            <div class="score-hint"><span>Not really</span><span>Massive problem</span></div>
+          </div>
+        </div>
+
+        <!-- Slide 5: Solution -->
+        <div class="slide s-sol">
+          <div class="glow" id="g3" style="width:280px;height:280px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
+          <div class="tag">The Solution</div>
+          <h2 style="font-size:clamp(20px,4vw,32px);font-weight:800;text-align:center;margin-bottom:7px;max-width:480px;color:var(--text);" id="solH">What if you could see who stopped — before they plateau?</h2>
+          <p style="font-size:14px;color:var(--muted);text-align:center;margin-bottom:22px;max-width:420px;" id="solSub">नैत्य gives patients a branded app and handles all follow-up automatically — over WhatsApp.</p>
+          <div class="sol-steps">
+            <div class="sol-step">
+              <div class="sol-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div><h4 id="sol1h">Patient leaves with a plan</h4><p id="sol1p">Branded app under your clinic's name. Exercise videos, sets & reps, reminders — all personalized.</p></div>
+            </div>
+            <div class="sol-step">
+              <div class="sol-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+              <div><h4>WhatsApp does the follow-up</h4><p id="sol2p">Timed reminders, completion logging, pain score prompts — automatically, at scale.</p></div>
+            </div>
+            <div class="sol-step">
+              <div class="sol-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+              <div><h4>You see everything in real time</h4><p>Dashboard flags who's at risk before they disappear — so you can intervene early.</p></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 6: Dashboard -->
+        <div class="slide s-dash">
+          <div class="tag">Your Dashboard</div>
+          <h2 style="font-size:clamp(18px,3.8vw,28px);font-weight:800;text-align:center;margin-bottom:5px;color:var(--text);">Real-time visibility. Zero manual follow-up.</h2>
+          <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:18px;">Every patient, every session — in one view.</p>
+          <div class="mini-dash">
+            <div class="md-hdr">
+              <span class="md-title">Clinic Overview — Today</span>
+              <span class="live-dot"><span></span> Live</span>
+            </div>
+            <div class="md-kpis">
+              <div class="md-kpi"><div class="md-kpi-v" style="color:var(--accent)">78%</div><div class="md-kpi-l" id="kpi1l">Adherence</div></div>
+              <div class="md-kpi"><div class="md-kpi-v" style="color:var(--text)">₹2.4L</div><div class="md-kpi-l">Revenue Rec.</div></div>
+              <div class="md-kpi"><div class="md-kpi-v" style="color:var(--amber)">3</div><div class="md-kpi-l">At Risk</div></div>
+            </div>
+            <div class="p-list" id="dashPatients"></div>
+          </div>
+        </div>
+
+        <!-- Slide 7: Summary -->
+        <div class="slide s-sum">
+          <div class="tag" style="margin-top:6px">Meeting Summary</div>
+          <h2 style="font-size:clamp(18px,3.8vw,26px);font-weight:800;text-align:center;margin-bottom:18px;color:var(--text);">Pain Point Scores</h2>
+          <div class="sum-grid" id="sumGrid"></div>
+          <div class="inp-wrap">
+            <label>Clinic / Doctor Name</label>
+            <input type="text" id="clinicName" placeholder="e.g. Dr. Priya Menon — ActiveLife, Bangalore"/>
+          </div>
+          <div class="inp-wrap">
+            <label>Notes</label>
+            <textarea id="clinicNotes" placeholder="Key takeaways, objections, interest level…"></textarea>
+          </div>
+          <button class="btn-save" onclick="saveClinic()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+            Save This Clinic
+          </button>
+          <div class="save-ok" id="saveOk">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Saved
+          </div>
+        </div>
+
+      </div><!-- /deck -->
+    </div><!-- /deckView -->
+
+    <!-- ROI VIEW -->
+    <div id="roiView">
+      <div class="roi-hdr">
+        <div class="tag">Revenue Impact</div>
+        <h2>What's non-adherence<br/>costing this clinic?</h2>
+        <p>Adjust the numbers live. Show the revenue leak and what नैत्य recovers.</p>
+      </div>
+
+      <!-- Clinic name field -->
+      <div class="roi-clinic-wrap">
+        <label>Clinic / Doctor Name</label>
+        <input type="text" id="roiClinicName" placeholder="e.g. Dr. Sharma — PhysioFirst, Mumbai"/>
+        <div class="roi-clinic-note">Saved with your ROI calculation when you tap "Copy Summary"</div>
+      </div>
+
+      <div class="sp-toggle">
+        <button class="sp-btn active" id="bP" onclick="setSp('physio')">Physiotherapy</button>
+        <button class="sp-btn"        id="bD" onclick="setSp('derm')">Dermatology</button>
+      </div>
+
+      <div class="calc-wrap">
+        <!-- Physio inputs -->
+        <div id="physioIn" class="inputs-card">
+          <h3>Clinic Numbers</h3>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Patients per week</span><span class="sl-val" id="pp_v">40</span></div>
+            <div class="sl-hint">Active patients on a home exercise programme</div>
+            <input type="range" id="pp" min="5" max="120" value="40" oninput="sl(this,'pp_v','',5,120);calcP()"/>
+            <div class="sl-bounds"><span>5</span><span>120</span></div>
+          </div>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Sessions per full programme</span><span class="sl-val" id="ps_v">12</span></div>
+            <div class="sl-hint">How many sessions does a complete course involve?</div>
+            <input type="range" id="ps" min="4" max="36" value="12" oninput="sl(this,'ps_v','',4,36);calcP()"/>
+            <div class="sl-bounds"><span>4</span><span>36</span></div>
+          </div>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Price per session</span><span class="sl-val" id="ppr_v">₹1,200</span></div>
+            <div class="sl-hint">Average fee per in-clinic session</div>
+            <input type="range" id="ppr" min="300" max="5000" step="100" value="1200" oninput="slR(this,'ppr_v',300,5000);calcP()"/>
+            <div class="sl-bounds"><span>₹300</span><span>₹5,000</span></div>
+          </div>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Current completion rate</span><span class="sl-val" id="pc_v">45%</span></div>
+            <div class="sl-hint">% of patients who complete their full programme</div>
+            <input type="range" id="pc" min="10" max="85" value="45" oninput="slPct(this,'pc_v',10,85);calcP()"/>
+            <div class="sl-bounds"><span>10%</span><span>85%</span></div>
+          </div>
+        </div>
+
+        <!-- Derm inputs -->
+        <div id="dermIn" class="inputs-card" style="display:none">
+          <h3>Clinic Numbers</h3>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Active patients per month</span><span class="sl-val" id="dp_v">80</span></div>
+            <div class="sl-hint">Patients currently on a prescribed skincare protocol</div>
+            <input type="range" id="dp" min="10" max="300" value="80" oninput="sl(this,'dp_v','',10,300);calcD()"/>
+            <div class="sl-bounds"><span>10</span><span>300</span></div>
+          </div>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Revenue per completed patient</span><span class="sl-val" id="dr_v">₹12,000</span></div>
+            <div class="sl-hint">Consultations + products for a patient who completes the protocol</div>
+            <input type="range" id="dr" min="1000" max="50000" step="500" value="12000" oninput="slR(this,'dr_v',1000,50000);calcD()"/>
+            <div class="sl-bounds"><span>₹1,000</span><span>₹50,000</span></div>
+          </div>
+          <div class="sl-group">
+            <div class="sl-hdr"><span class="sl-label">Current protocol completion</span><span class="sl-val" id="dc_v">40%</span></div>
+            <div class="sl-hint">% of patients who complete their full protocol</div>
+            <input type="range" id="dc" min="10" max="85" value="40" oninput="slPct(this,'dc_v',10,85);calcD()"/>
+            <div class="sl-bounds"><span>10%</span><span>85%</span></div>
+          </div>
+        </div>
+
+        <div class="results-stack" id="roiResults"></div>
+      </div>
+    </div><!-- /roiView -->
+
+  </div><!-- /content -->
+
+  <!-- NAV ARROWS -->
+  <button class="nav-arr prev hidden" id="prevBtn" onclick="go(-1)" disabled>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="nav-arr next hidden" id="nextBtn" onclick="go(1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+  </button>
+
+  <!-- TAB BAR -->
+  <div class="tabbar">
+    <button class="tab-btn active" id="tabDeck" onclick="switchTab('deck')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Validation
+    </button>
+    <div class="tab-divider"></div>
+    <button class="tab-btn" id="tabRoi" onclick="switchTab('roi')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      ROI
+    </button>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div class="history-panel" id="histPanel">
+    <div class="hp-hdr">
+      <h2>Clinic Research Log</h2>
+      <div class="close-btn" onclick="closeHist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div id="histContent"></div>
+  </div>
+
+</div><!-- /mainTool -->
+
+<script>
+  /* ══ CONTENT BY SPECIALTY ══ */
+  const content = {
+    physio: {
+      hookTag:  'Physiotherapy Research',
+      hookLbl:  'of your patients stop their home exercise programme <strong>before they fully recover.</strong>',
+      p1h: "Patients stop exercising.<br/>You're the last to know.",
+      p1s: "You prescribe a home programme after every session. By day 10, most patients have quietly stopped — and you won't find out until they plateau or don't rebook.",
+      p2h: 'No visibility<br/>between sessions.',
+      p2s: "There's no way to know which patients are at risk until they stop improving — or stop rebooking. By then, the window to intervene has closed.",
+      p3h: "Manual follow-up is<br/>eating your team's time.",
+      p3s: "WhatsApp reminders sent one by one. No record of who responded or who's actually doing the work. There's no way to scale this.",
+      solSub: 'नैत्य gives patients a branded app and handles all follow-up automatically — over WhatsApp.',
+      sol1p: 'Branded app under your clinic\'s name. Exercise videos, sets & reps, reminders — personalized for each patient.',
+      sol2p: 'Timed reminders, completion logging, pain score prompts — automatically, at scale.',
+      dashP: [
+        { init:'RS', name:'Rahul Singh',  sub:'Knee rehab · Week 3',       cls:'pg', lbl:'On Track' },
+        { init:'PM', name:'Priya Mehta',  sub:'Post-op shoulder · Week 2',  cls:'pa', lbl:'Partial', ac:'amber' },
+        { init:'AK', name:'Arjun Kumar',  sub:'Lower back · Week 4',        cls:'pr', lbl:'At Risk',  ac:'danger' },
+      ],
+      kpi1: 'Adherence',
+      painLabels: ['Home exercise drop-off','No visibility between sessions','Manual WhatsApp follow-up'],
+      glowA: 'rgba(0,196,154,0.1)',
+      glowB: 'rgba(0,100,200,0.08)',
+      glowC: 'rgba(0,196,154,0.07)',
+    },
+    derm: {
+      hookTag:  'Dermatology Research',
+      hookLbl:  'of your patients stop following their skincare protocol <strong>before they see real results.</strong>',
+      p1h: "Patients stop applying their topicals.<br/>You're the last to know.",
+      p1s: "You prescribe a 12-week tretinoin protocol. By week 3, most patients have quietly stopped — and you won't find out until results disappoint or they don't rebook.",
+      p2h: 'No visibility<br/>between consultations.',
+      p2s: "There's no way to know if patients are following their regime until they come back with poor results — or don't come back at all.",
+      p3h: "Manual follow-up is<br/>eating your team's time.",
+      p3s: "WhatsApp reminders for topical compliance sent one by one. No record of who's applying what, no photo log, no way to scale.",
+      solSub: 'नैत्य gives patients a branded app with their regime and handles all follow-up — daily photo prompts, topical reminders, progress tracking — over WhatsApp.',
+      sol1p: 'Branded app under your clinic\'s name. Topical regime, product instructions, reminders — personalized for each patient.',
+      sol2p: 'Timed topical reminders, daily photo prompts, symptom logging — automatically, at scale.',
+      dashP: [
+        { init:'AN', name:'Ananya Nair',  sub:'Acne protocol · Week 6',     cls:'pg', lbl:'On Track' },
+        { init:'RM', name:'Riya Mehta',   sub:'Melasma · Week 4',           cls:'pa', lbl:'Partial', ac:'amber' },
+        { init:'SK', name:'Suresh Kumar', sub:'Anti-ageing · Week 8',       cls:'pr', lbl:'At Risk',  ac:'danger' },
+      ],
+      kpi1: 'Compliance',
+      painLabels: ['Topical regime drop-off','No visibility between consults','Manual compliance follow-up'],
+      glowA: 'rgba(92,111,224,0.12)',
+      glowB: 'rgba(180,100,200,0.08)',
+      glowC: 'rgba(92,111,224,0.08)',
+    }
+  };
+
+  /* ══ STATE ══ */
+  const TOTAL = 7;
+  let cur = 0, specialty = 'physio', activeTab = 'deck', roiSp = 'physio';
+  const scores = {1:0, 2:0, 3:0};
+
+  /* ══ SELECTION ══ */
+  function chooseSpecialty(sp) {
+    specialty = sp;
+    roiSp = sp;
+
+    // Switch theme
+    document.body.className = 't-' + sp;
+
+    // Apply content
+    const C = content[sp];
+    document.getElementById('hookTag').textContent  = C.hookTag;
+    document.getElementById('hookLabel').innerHTML  = C.hookLbl;
+    document.getElementById('p1h').innerHTML = C.p1h;
+    document.getElementById('p1s').textContent = C.p1s;
+    document.getElementById('p2h').innerHTML = C.p2h;
+    document.getElementById('p2s').textContent = C.p2s;
+    document.getElementById('p3h').innerHTML = C.p3h;
+    document.getElementById('p3s').textContent = C.p3s;
+    document.getElementById('solSub').textContent = C.solSub;
+    document.getElementById('sol1p').textContent = C.sol1p;
+    document.getElementById('sol2p').textContent = C.sol2p;
+    document.getElementById('kpi1l').textContent = C.kpi1;
+    document.getElementById('roiSpBadge').textContent = sp === 'physio' ? 'Physiotherapy' : 'Dermatology';
+
+    // Glow colors
+    document.getElementById('g1').style.background = C.glowA;
+    document.getElementById('g2').style.background = C.glowB;
+    document.getElementById('g3').style.background = C.glowC;
+
+    // Dashboard patients
+    const dp = document.getElementById('dashPatients');
+    dp.innerHTML = C.dashP.map(p => {
+      const avStyle = p.ac ? `background:var(--${p.ac}-glow,rgba(255,255,255,0.05));color:var(--${p.ac})` : '';
+      return `<div class="p-row">
+        <div class="p-av" style="${avStyle}">${p.init}</div>
+        <div style="flex:1"><div class="p-nm">${p.name}</div><div class="p-sp">${p.sub}</div></div>
+        <span class="pb ${p.cls}">${p.lbl}</span>
+      </div>`;
+    }).join('');
+
+    // ROI — lock to selected specialty, hide toggle entirely
+    document.querySelector('.sp-toggle').style.display = 'none';
+    document.getElementById('physioIn').style.display = sp === 'physio' ? '' : 'none';
+    document.getElementById('dermIn').style.display   = sp === 'derm'   ? '' : 'none';
+
+    // Logo icon color for derm (light bg needs different treatment)
+    document.querySelector('.logo-icon svg').style.stroke = sp === 'derm' ? '#fff' : '#0A0F1E';
+
+    // Transition
+    document.getElementById('selectScreen').classList.add('out');
+    setTimeout(() => {
+      document.getElementById('selectScreen').style.display = 'none';
+      document.getElementById('mainTool').classList.add('visible');
+      buildDots();
+      switchTab('deck');
+      calcCurrent();
+      initSliders();
+    }, 380);
+  }
+
+  function backToSelect() {
+    document.getElementById('mainTool').classList.remove('visible');
+    document.getElementById('selectScreen').style.display = 'flex';
+    document.getElementById('selectScreen').classList.remove('out');
+    // Reset scores
+    scores[1]=0; scores[2]=0; scores[3]=0;
+    [1,2,3].forEach(i => document.getElementById('sc'+i).querySelectorAll('.sdot').forEach(d => d.className='sdot'));
+    goTo(0);
+  }
+
+  /* ══ PROGRESS DOTS ══ */
+  function buildDots() {
+    const pd = document.getElementById('progDots');
+    pd.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const d = document.createElement('div');
+      d.className = 'prog-dot' + (i===0?' active':'');
+      d.id = 'pd'+i;
+      pd.appendChild(d);
+    }
+  }
+
+  function updateDots() {
+    for (let i = 0; i < TOTAL; i++) {
+      const d = document.getElementById('pd'+i);
+      if (!d) return;
+      d.className = 'prog-dot' + (i===cur?' active':i<cur?' visited':'');
+    }
+  }
+
+  /* ══ DECK ══ */
+  function go(dir) { goTo(Math.max(0, Math.min(TOTAL-1, cur+dir))); }
+  function goTo(n) {
+    cur = n;
+    document.getElementById('deck').style.transform = `translateX(-${cur*100}vw)`;
+    document.getElementById('slideCtr').textContent = `${cur+1} / ${TOTAL}`;
+    document.getElementById('prevBtn').disabled = cur===0;
+    document.getElementById('nextBtn').disabled = cur===TOTAL-1;
+    updateDots();
+    if (cur===TOTAL-1) renderSummary();
+  }
+
+  /* ══ TAB SWITCH ══ */
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('deckView').style.display  = tab==='deck' ? 'block' : 'none';
+    document.getElementById('roiView').classList.toggle('active', tab==='roi');
+    document.getElementById('tabDeck').className = 'tab-btn' + (tab==='deck'?' active':'');
+    document.getElementById('tabRoi').className  = 'tab-btn' + (tab==='roi' ?' active':'');
+    document.getElementById('deckTop').style.display = tab==='deck' ? 'flex' : 'none';
+    document.getElementById('roiTop').style.display  = tab==='roi'  ? 'flex' : 'none';
+    document.getElementById('prevBtn').classList.toggle('hidden', tab!=='deck');
+    document.getElementById('nextBtn').classList.toggle('hidden', tab!=='deck');
+    if (tab==='roi') { calcCurrent(); initSliders(); }
+  }
+
+  /* ══ SCORING ══ */
+  function setScore(pain, val) {
+    scores[pain] = val;
+    document.getElementById('sc'+pain).querySelectorAll('.sdot').forEach((d, i) => {
+      d.className = 'sdot';
+      if (i < val) d.classList.add(val<=2?'lo':val===3?'mi':'hi');
+    });
+  }
+
+  /* ══ SUMMARY ══ */
+  function renderSummary() {
+    const C = content[specialty];
+    const g = document.getElementById('sumGrid');
+    g.innerHTML = '';
+    C.painLabels.forEach((lbl, i) => {
+      const s = scores[i+1];
+      const cls = s<=2?'plo':s===3?'pmi':'phi';
+      let pips = '';
+      for (let p=1;p<=5;p++) pips += `<div class="pip ${p<=s?cls:''}">${p<=s?s:''}</div>`;
+      const none = s===0 ? '<span style="font-size:11px;color:var(--muted)">Not scored</span>' : '';
+      g.innerHTML += `<div class="sum-row"><span class="sum-lbl">${lbl}</span><div class="sum-pips">${s>0?pips:none}</div></div>`;
+    });
+  }
+
+  /* ══ SAVE ══ */
+  function saveClinic() {
+    const name  = document.getElementById('clinicName').value.trim() || 'Unnamed Clinic';
+    const notes = document.getElementById('clinicNotes').value.trim();
+    const roi   = document.getElementById('roiClinicName').value.trim();
+    const saved = getSaved();
+    saved.push({
+      id:Date.now(), name, notes, scores:{...scores}, specialty,
+      roiClinic: roi || name,
+      date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+    });
+    localStorage.setItem('naaitya_clinics', JSON.stringify(saved));
+    updateCount();
+    // Sync clinic name to ROI field
+    if (!roi && name !== 'Unnamed Clinic') document.getElementById('roiClinicName').value = name;
+    document.getElementById('clinicName').value = '';
+    document.getElementById('clinicNotes').value = '';
+    const ok = document.getElementById('saveOk');
+    ok.classList.add('show');
+    setTimeout(() => ok.classList.remove('show'), 2400);
+  }
+
+  function getSaved() { try { return JSON.parse(localStorage.getItem('naaitya_clinics')||'[]'); } catch { return []; } }
+  function updateCount() { document.getElementById('hCount').textContent = getSaved().length; }
+
+  /* ══ HISTORY ══ */
+  function openHist() { document.getElementById('histPanel').classList.add('open'); renderHist(); }
+  function closeHist() { document.getElementById('histPanel').classList.remove('open'); }
+  function renderHist() {
+    const saved = getSaved();
+    const el = document.getElementById('histContent');
+    if (!saved.length) { el.innerHTML='<div class="empty-h">No clinics saved yet.</div>'; return; }
+    const chip = s => {
+      if (!s) return '<span style="color:var(--muted)">—</span>';
+      return `<span class="schip ${s<=2?'sc-lo':s===3?'sc-mi':'sc-hi'}">${s}</span>`;
+    };
+    const C = content;
+    el.innerHTML = `
+      <table class="h-table">
+        <thead><tr><th>Clinic</th><th>Type</th><th>Date</th><th>P1</th><th>P2</th><th>P3</th><th>Notes</th></tr></thead>
+        <tbody>${saved.slice().reverse().map(c=>`
+          <tr>
+            <td style="font-weight:600">${c.name}</td>
+            <td style="color:var(--muted);font-size:12px">${c.specialty==='derm'?'Derm':'Physio'}</td>
+            <td style="color:var(--muted)">${c.date}</td>
+            <td>${chip(c.scores[1])}</td>
+            <td>${chip(c.scores[2])}</td>
+            <td>${chip(c.scores[3])}</td>
+            <td style="color:var(--muted);font-size:12px;max-width:160px">${c.notes||'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <button class="clear-btn" onclick="clearAll()">Clear all data</button>`;
+  }
+  function clearAll() {
+    if (confirm('Delete all saved clinics?')) { localStorage.removeItem('naaitya_clinics'); updateCount(); renderHist(); }
+  }
+
+  /* ══ ROI ══ */
+  function setSp(sp) {
+    roiSp = sp;
+    document.getElementById('bP').className = 'sp-btn'+(sp==='physio'?' active':'');
+    document.getElementById('bD').className = 'sp-btn'+(sp==='derm'  ?' active':'');
+    document.getElementById('physioIn').style.display = sp==='physio'?'':'none';
+    document.getElementById('dermIn').style.display   = sp==='derm'  ?'':'none';
+    calcCurrent();
+  }
+  function calcCurrent() { roiSp==='physio' ? calcP() : calcD(); }
+
+  /* Slider helpers */
+  function setPct(el,min,max) { el.style.setProperty('--pct',((+el.value-min)/(max-min)*100).toFixed(1)+'%'); }
+  function sl(el,id,prefix,min,max) { setPct(el,min,max); document.getElementById(id).textContent=prefix+el.value; }
+  function slR(el,id,min,max) { setPct(el,min,max); document.getElementById(id).textContent='₹'+fmtN(+el.value); }
+  function slPct(el,id,min,max) { setPct(el,min,max); document.getElementById(id).textContent=el.value+'%'; }
+  function fmtN(n) { return n>=100000?(n/100000).toFixed(1).replace(/\.0$/,'')+'L':n>=1000?Math.round(n/1000)+',000':n; }
+  function fmt(n)  { return '₹'+fmtN(Math.round(n)); }
+
+  function getClinicLabel() {
+    const v = document.getElementById('roiClinicName').value.trim();
+    return v ? `for <strong>${v}</strong>` : 'for this clinic';
+  }
+
+  function calcP() {
+    const pw=+document.getElementById('pp').value, ses=+document.getElementById('ps').value,
+          pr=+document.getElementById('ppr').value, cp=+document.getElementById('pc').value/100;
+    const pm=pw*4, icp=Math.min(cp+0.27,0.90), dr=1-cp, ndr=1-icp, dSes=ses*0.30;
+    const rec = pm*((icp-cp)*ses*pr - (icp-cp)*dSes*pr);
+    const hrs = pm*18/60;
+    render(`
+      <div class="res-card">
+        <div class="res-lbl">Revenue lost to drop-offs / month</div>
+        <div class="res-val amber">${fmt(pm*dr*(ses-dSes)*pr)}</div>
+        <div class="res-sub">${Math.round(pm*dr)} patients/month stop before completing their programme</div>
+        <div class="breakdown">
+          <div class="brow"><span>Completing in full</span><span>${Math.round(pm*cp)}/month</span></div>
+          <div class="brow"><span>Dropping off</span><span style="color:var(--danger)">${Math.round(pm*dr)}/month</span></div>
+          <div class="brow"><span>Sessions lost per drop-off</span><span>${(ses*0.70).toFixed(1)} avg</span></div>
+        </div>
+      </div>
+      <div class="res-card hl">
+        <div class="res-lbl">Monthly revenue recoverable with नैत्य</div>
+        <div class="res-val teal">${fmt(rec)}</div>
+        <div class="res-sub">Completion: <strong>${Math.round(cp*100)}% → ${Math.round(icp*100)}%</strong></div>
+        <div class="breakdown">
+          <div class="brow"><span>Additional completions</span><span style="color:var(--green)">+${Math.round(pm*(icp-cp))}/month</span></div>
+          <div class="brow"><span>Extra sessions billed</span><span>+${Math.round(pm*(icp-cp)*ses)}/month</span></div>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-lbl">Staff time saved</div>
+        <div class="res-val white">${Math.round(hrs)} hrs<span style="font-size:15px;color:var(--muted)">/month</span></div>
+        <div class="res-sub">~18 min of manual WhatsApp follow-up per patient eliminated</div>
+      </div>
+      <div class="annual-bar">
+        <div><p style="font-size:12px;color:var(--muted)">Annual revenue recovered</p><div class="big">${fmt(rec*12)}</div></div>
+        <div class="annual-bar-right">
+          <p>Time saved / year</p><strong>${Math.round(hrs*12)} hrs</strong>
+          <p style="margin-top:5px">Payback period</p><strong>&lt; 30 days</strong>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyRes('physio',${rec},${rec*12},${Math.round(hrs*12)},${Math.round(cp*100)},${Math.round(icp*100)})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Summary
+      </button>
+      <div class="assumptions"><strong>Assumptions:</strong> Drop-offs complete ~30% of their programme. नैत्य improves completion by ~27pp, based on published physiotherapy adherence research.</div>
+    `);
+  }
+
+  function calcD() {
+    const p=+document.getElementById('dp').value, r=+document.getElementById('dr').value,
+          cp=+document.getElementById('dc').value/100;
+    const ic=Math.min(cp+0.28,0.92), dr=1-cp, ndr=1-ic;
+    const curR=p*(cp*r+dr*r*0.25), impR=p*(ic*r+ndr*r*0.25);
+    const rec=impR-curR, ref=p*(ic-cp)*r*0.28, tot=rec+ref, hrs=p*20/60;
+    render(`
+      <div class="res-card">
+        <div class="res-lbl">Protocol revenue lost / month</div>
+        <div class="res-val amber">${fmt(p*dr*r*0.75)}</div>
+        <div class="res-sub">${Math.round(p*dr)} patients/month abandon their protocol before completion</div>
+        <div class="breakdown">
+          <div class="brow"><span>Completing protocol</span><span>${Math.round(p*cp)}/month</span></div>
+          <div class="brow"><span>Dropping off</span><span style="color:var(--danger)">${Math.round(p*dr)}/month</span></div>
+        </div>
+      </div>
+      <div class="res-card hl">
+        <div class="res-lbl">Monthly revenue recoverable with नैत्य</div>
+        <div class="res-val teal">${fmt(tot)}</div>
+        <div class="res-sub">Completion: <strong>${Math.round(cp*100)}% → ${Math.round(ic*100)}%</strong> · includes product refill revenue</div>
+        <div class="breakdown">
+          <div class="brow"><span>Protocol revenue recovered</span><span>${fmt(rec)}</span></div>
+          <div class="brow"><span>Product refill revenue</span><span>${fmt(ref)}</span></div>
+          <div class="brow"><span>Additional completers</span><span style="color:var(--green)">+${Math.round(p*(ic-cp))}/month</span></div>
+        </div>
+      </div>
+      <div class="res-card">
+        <div class="res-lbl">Staff time saved</div>
+        <div class="res-val white">${Math.round(hrs)} hrs<span style="font-size:15px;color:var(--muted)">/month</span></div>
+        <div class="res-sub">~20 min of manual compliance follow-up per patient eliminated</div>
+      </div>
+      <div class="annual-bar">
+        <div><p style="font-size:12px;color:var(--muted)">Annual revenue recovered</p><div class="big">${fmt(tot*12)}</div></div>
+        <div class="annual-bar-right">
+          <p>Time saved / year</p><strong>${Math.round(hrs*12)} hrs</strong>
+          <p style="margin-top:5px">Payback period</p><strong>&lt; 30 days</strong>
+        </div>
+      </div>
+      <button class="copy-btn" onclick="copyRes('derm',${tot},${tot*12},${Math.round(hrs*12)},${Math.round(cp*100)},${Math.round(ic*100)})">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Summary
+      </button>
+      <div class="assumptions"><strong>Assumptions:</strong> Drop-offs generate ~25% of full protocol revenue. नैत्य improves completion by ~28pp. Refill revenue at 28% of protocol value per additional completer.</div>
+    `);
+  }
+
+  function render(html) { document.getElementById('roiResults').innerHTML = html; initSliders(); }
+
+  function copyRes(sp, monthly, annual, hrs, from, to) {
+    const clinic = document.getElementById('roiClinicName').value.trim() || 'Clinic';
+    const type   = sp==='physio' ? 'Physiotherapy' : 'Dermatology';
+    const text   = `नैत्य ROI Estimate — ${type}\nClinic: ${clinic}\nCompletion: ${from}% → ${to}%\nMonthly revenue recovered: ${fmt(monthly)}\nAnnual impact: ${fmt(annual)}\nTime saved/year: ${hrs} hrs`;
+    navigator.clipboard.writeText(text).then(() => {
+      const b = event.target.closest('.copy-btn');
+      const orig = b.innerHTML;
+      b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      b.style.color = 'var(--accent)';
+      setTimeout(() => { b.innerHTML=orig; b.style.color=''; }, 2000);
+    });
+  }
+
+  function initSliders() {
+    document.querySelectorAll('input[type=range]').forEach(el => setPct(el,+el.min,+el.max));
+  }
+
+  /* ══ SWIPE ══ */
+  let tx=0;
+  document.addEventListener('touchstart', e => { tx=e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    if (activeTab!=='deck') return;
+    if (Math.abs(tx-e.changedTouches[0].clientX)>55) go(tx>e.changedTouches[0].clientX?1:-1);
+  });
+
+  /* ══ INIT ══ */
+  updateCount();
+</script>
+</body>
+</html>
