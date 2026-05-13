@@ -78,8 +78,15 @@ h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2}
 .nav-arr:disabled{opacity:.2;pointer-events:none}
 .nav-arr.hidden{display:none}
 .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--tag-text);background:var(--tag-bg);border:1px solid var(--tag-border);border-radius:100px;padding:5px 14px;margin-bottom:14px}
-#deckView,#wedgeView{position:relative;width:100%;height:100%;display:none}
-#deckView.active,#wedgeView.active{display:block}
+#deckView{position:relative;width:100%;height:100%;display:none}
+#deckView.active{display:block}
+#wedgeView{display:contents}
+.wify-reminder,.w-coach{display:none}
+body.coach-on .wify-reminder,body.coach-on .w-coach{display:block}
+.coach-toggle{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .2s;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.coach-toggle:hover{color:var(--text)}
+.coach-toggle svg{width:14px;height:14px}
+.coach-toggle.on{background:var(--accent-g);border-color:var(--accent-b);color:var(--accent)}
 .slide,.w-slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 26px;opacity:0;pointer-events:none;transform:translateX(40px);transition:opacity .35s,transform .35s;overflow-y:auto}
 .slide.active,.w-slide.active{opacity:1;pointer-events:auto;transform:translateX(0)}
 .slide.left,.w-slide.left{transform:translateX(-40px)}
@@ -383,10 +390,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <div id="mainTool">
   <div class="topbar">
     <div class="logo" onclick="backToSelect()"><div class="logo-icon"><svg id="logoSvg" viewBox="0 0 24 24" fill="none" stroke="#0A0F1E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>नैत्य</div>
-    <div class="topbar-mid" id="deckTop"><div id="progDots" style="display:flex;gap:6px;align-items:center;"></div><span class="slide-ctr" id="slideCtr">1 / 8</span></div>
+    <div class="topbar-mid" id="deckTop"><span class="slide-ctr" id="slideCtr" style="font-size:13px">1 / 14</span><span id="phaseLabel" style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-left:6px"></span></div>
     <div class="topbar-mid" id="roiTop" style="display:none"><span class="sp-badge" id="roiSpBadge">Physiotherapy</span></div>
-    <div class="topbar-mid" id="wedgeTop" style="display:none"><span class="wedge-prog">Wedge · <strong id="wedgeNum">1</strong> of <span id="wedgeTotal">5</span></span></div>
-    <button class="history-btn" onclick="openHist()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Clinics<span class="h-count" id="hCount">0</span></button>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="coach-toggle" id="coachToggleBtn" onclick="toggleCoach()" title="Toggle interviewer prompts">
+        <svg id="coachEye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        <span id="coachLbl">Prompts</span>
+      </button>
+      <button class="history-btn" onclick="openHist()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Clinics<span class="h-count" id="hCount">0</span></button>
+    </div>
   </div>
 
   <div class="content">
@@ -485,6 +497,139 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
         </div>
       </div>
 
+      <div id="wedgeView">
+
+      <div class="w-slide" data-slide="wmag">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 1 of 5</span><span style="font-size:11px;color:var(--danger);font-weight:700">Required</span></div>
+          <h2 class="w-title">How valuable would this actually be?</h2>
+          <div class="w-coach"><span class="w-coach-tag">Ask</span>"<span id="magCoach">If we could realistically recover that revenue</span> for you — how meaningful would that be? Scale of 1 to 10, where 10 means it would transform your clinic."</div>
+          <div class="mag-display" id="magDisp">5</div>
+          <div class="mag-slider-wrap"><input type="range" id="magSlider" min="1" max="10" value="5" oninput="onMagSlider(this.value)"/><div class="mag-anchor-row"><span>1 · Not meaningful</span><span>5 · Useful</span><span>10 · Transform</span></div></div>
+          <div class="field-wrap"><label>In their words — what would they do with that recovered revenue? <span class="req">*</span></label><textarea id="magQuote" placeholder='e.g. "I&apos;d hire two more therapists"' oninput="onWedgeInput('magnitude.quote',this.value)"></textarea></div>
+          <div class="w-must">Required — magnitude is the foundation of the wedge.</div>
+        </div>
+      </div>
+
+      <div class="w-slide" data-slide="wsub">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 2 of 5</span><span class="skip-link" onclick="go(1)">Skip this slide</span></div>
+          <h2 class="w-title">The trade-off test</h2>
+          <div class="subgroup">
+            <div class="subgroup-lbl">Substitution</div>
+            <div class="w-coach"><span class="w-coach-tag">Ask</span>"If you had ₹15,000/month for either a part-time receptionist for follow-up OR our platform at ₹5,000/month — which would you pick? Be honest."</div>
+            <div class="radio-group">
+              <div class="radio-opt" data-sub="platform" onclick="setSubChoice('platform')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Picks the platform</div><span class="signal-tag sig-green">Strong</span><span class="sig-pts">10</span></div>
+              <div class="radio-opt" data-sub="hesitates" onclick="setSubChoice('hesitates')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Hesitates or depends</div><span class="signal-tag sig-yellow">Mixed</span><span class="sig-pts">5</span></div>
+              <div class="radio-opt" data-sub="status_quo" onclick="setSubChoice('status_quo')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Receptionist / status quo</div><span class="signal-tag sig-red">Weak</span><span class="sig-pts">0</span></div>
+            </div>
+            <div class="field-wrap"><label>Why? Capture verbatim</label><input type="text" id="subReason" placeholder="Their exact words" oninput="onWedgeInput('substitution.reason',this.value)"/></div>
+          </div>
+          <div class="subgroup" style="margin-top:14px">
+            <div class="subgroup-lbl">Urgency</div>
+            <div class="w-coach"><span class="w-coach-tag">Ask</span>"If you decided to do this, when would you actually want it up and running?"</div>
+            <div class="radio-group">
+              <div class="radio-opt" data-urg="this_month" onclick="setUrgency('this_month')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">This month</div><span class="sig-pts">10</span></div>
+              <div class="radio-opt" data-urg="this_quarter" onclick="setUrgency('this_quarter')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">This quarter</div><span class="sig-pts">7</span></div>
+              <div class="radio-opt" data-urg="this_year" onclick="setUrgency('this_year')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Sometime this year</div><span class="sig-pts">3</span></div>
+              <div class="radio-opt" data-urg="not_priority" onclick="setUrgency('not_priority')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Not a priority right now</div><span class="sig-pts">0</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-slide" data-slide="wwallet">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 3 of 5</span><span class="skip-link" onclick="go(1)">Skip this slide</span></div>
+          <h2 class="w-title">What would feel reasonable?</h2>
+          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Magic button. Tell me a price per month where you'd <strong>instantly say yes</strong> — no thinking. And one where you'd <strong>instantly say no</strong> — too much."</div>
+          <div class="wallet-card wallet-yes">
+            <div class="wallet-card-hdr"><span class="wallet-card-lbl yes-c">Instant YES · ₹/month</span><span class="wallet-display yes-c" id="walletYesDisp">₹3,000</span></div>
+            <input type="range" id="walletYes" min="500" max="20000" step="500" value="3000" oninput="onWalletYes(this.value)"/>
+            <div class="sl-bounds"><span>₹500</span><span>₹20,000</span></div>
+          </div>
+          <div class="wallet-card wallet-no">
+            <div class="wallet-card-hdr"><span class="wallet-card-lbl no-c">Instant NO · ₹/month</span><span class="wallet-display no-c" id="walletNoDisp">₹15,000</span></div>
+            <input type="range" id="walletNo" min="1000" max="50000" step="1000" value="15000" oninput="onWalletNo(this.value)"/>
+            <div class="sl-bounds"><span>₹1,000</span><span>₹50,000</span></div>
+            <div class="wallet-err" id="walletErr">NO must be ≥ YES.</div>
+          </div>
+          <div class="wallet-window">
+            <div class="ww-line"><span class="wk">Pricing window</span><span class="wv" id="wwRange">₹3,000 – ₹15,000</span></div>
+            <div class="ww-line"><span class="wk">Comfortable midpoint</span><span class="wv" id="wwMid">₹9,000</span></div>
+            <div class="ww-line"><span class="wk">Window width</span><span class="wv" id="wwWidth">₹12,000</span></div>
+            <div class="ww-class" id="wwClass">Wide — strong demand</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-slide" data-slide="wcommit">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 4 of 5</span><span style="font-size:11px;color:var(--danger);font-weight:700">Reaction required</span></div>
+          <h2 class="w-title">What would they commit to today?</h2>
+          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Three quick yes/nos: (a) Could you introduce me to peer clinics? (b) Would you pilot this 60 days free with 10 patients? (c) If it works, would you write a testimonial?"<div style="margin-top:6px;color:var(--text);font-style:normal;font-weight:600;font-size:11px">Capture their reaction — not just their words. Hesitation matters.</div></div>
+          <div class="check-group">
+            <div class="check-opt" data-c="intro"><div class="check-hdr" onclick="toggleCommit('intro')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Will introduce me to peer clinics</div></div><div class="check-sub"><input type="text" id="introNames" placeholder="Names mentioned" oninput="onWedgeInput('commitment.introNames',this.value)"/></div></div>
+            <div class="check-opt" data-c="pilot"><div class="check-hdr" onclick="toggleCommit('pilot')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Willing to pilot — 60 days, 10 patients</div></div><div class="check-sub"><input type="text" id="pilotConds" placeholder="Conditions? e.g. 'only if it does X'" oninput="onWedgeInput('commitment.pilotConds',this.value)"/></div></div>
+            <div class="check-opt" data-c="testimonial"><div class="check-hdr" onclick="toggleCommit('testimonial')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Will write a testimonial if it works</div></div><div class="check-sub"><input type="text" id="testimonialNotes" placeholder="Notes" oninput="onWedgeInput('commitment.testimonialNotes',this.value)"/></div></div>
+          </div>
+          <div class="subgroup" style="margin-top:14px">
+            <div class="subgroup-lbl">Their reaction <span class="req">*</span></div>
+            <div class="radio-group">
+              <div class="radio-opt" data-rxn="enthusiastic" onclick="setReaction('enthusiastic')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Enthusiastic</div><span class="signal-tag sig-green">Strong</span></div>
+              <div class="radio-opt" data-rxn="cautious" onclick="setReaction('cautious')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Cautious</div><span class="signal-tag sig-yellow">Mixed</span></div>
+              <div class="radio-opt" data-rxn="hesitant" onclick="setReaction('hesitant')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Hesitant</div><span class="signal-tag sig-yellow">Watch</span></div>
+              <div class="radio-opt" data-rxn="declined" onclick="setReaction('declined')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Declined</div><span class="signal-tag sig-red">Weak</span></div>
+            </div>
+            <div class="field-wrap"><label>What did they actually say or do?</label><input type="text" id="reactionNote" placeholder="Body language, exact words…" oninput="onWedgeInput('commitment.reactionNote',this.value)"/></div>
+          </div>
+          <div class="w-must">Reaction is required — silence is data.</div>
+        </div>
+      </div>
+
+      <div class="w-slide" data-slide="wloi">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 5 of 5</span><span class="skip-link" onclick="go(1)">Skip this slide</span></div>
+          <h2 class="w-title">Would they sign an LOI this week?</h2>
+          <div class="w-coach"><span class="w-coach-tag">Ask</span>"I'll send you a one-page Letter of Intent — non-binding. Says you'd pilot 60 days free with 10 patients in exchange for early-partner pricing. Would you sign it this week?"</div>
+          <div class="subgroup-lbl">Their response</div>
+          <div class="radio-group">
+            <div class="radio-opt" data-loi="yes_now" onclick="setLoi('yes_now')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Yes — send it now</div><span class="signal-tag sig-green">Strong</span><span class="sig-pts">10</span></div>
+            <div class="radio-opt" data-loi="probably" onclick="setLoi('probably')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Send it, I'll review and probably sign</div><span class="signal-tag sig-yellow">Probable</span><span class="sig-pts">7</span></div>
+            <div class="radio-opt" data-loi="maybe" onclick="setLoi('maybe')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Send it, I'll think about it</div><span class="signal-tag sig-yellow">Weak</span><span class="sig-pts">3</span></div>
+            <div class="radio-opt" data-loi="wait" onclick="setLoi('wait')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Wait until you've built something</div><span class="signal-tag sig-red">Not yet</span><span class="sig-pts">0</span></div>
+          </div>
+          <div class="subgroup" style="margin-top:12px">
+            <div class="subgroup-lbl">How hesitant did they seem?</div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--muted)">None</span><input type="range" id="hesSlider" min="1" max="5" value="3" oninput="onHesSlider(this.value)" style="flex:1"/><span style="font-size:11px;color:var(--muted)">Heavy</span><span class="sl-val" id="hesVal">3</span></div>
+          </div>
+          <div class="field-wrap"><label>Exact words and body language</label><textarea id="loiQuote" placeholder='e.g. "She paused, then said send it."' oninput="onWedgeInput('loi.quote',this.value)"></textarea></div>
+          <div class="field-wrap"><label>Promised follow-up date</label><input type="date" id="loiDate" oninput="onWedgeInput('loi.followupDate',this.value)"/></div>
+        </div>
+      </div>
+
+      <div class="w-slide" data-slide="wasym">
+        <div class="w-inner">
+          <div class="w-top-bar"><span class="w-eyebrow">Asymmetric · Bonus</span><span style="font-size:11px;color:var(--danger);font-weight:700">Required</span></div>
+          <h2 class="w-title">The strongest reason against</h2>
+          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Pretend it worked exactly as described. What's the strongest reason you'd still <strong>not</strong> use it? Be brutal — your honesty here is more valuable than any praise."</div>
+          <div class="field-wrap"><label>Their objection — verbatim <span class="req">*</span></label><textarea id="asymObj" placeholder="At least one full sentence." oninput="onWedgeInput('asymmetric.objection',this.value)"></textarea></div>
+          <div class="subgroup-lbl" style="margin-top:12px">Category (multi-select)</div>
+          <div class="tag-sel" id="asymTags">
+            <span class="tag-sel-opt" data-tag="patient">Patient adoption</span>
+            <span class="tag-sel-opt" data-tag="team">Team adoption</span>
+            <span class="tag-sel-opt" data-tag="integration">Integration</span>
+            <span class="tag-sel-opt" data-tag="pricing">Pricing / budget</span>
+            <span class="tag-sel-opt" data-tag="trust">Trust / credibility</span>
+            <span class="tag-sel-opt" data-tag="priorities">Competing priorities</span>
+            <span class="tag-sel-opt" data-tag="other">Other</span>
+          </div>
+          <div class="w-must">Required — this is the most diagnostic question in the interview.</div>
+        </div>
+      </div>
+
+      </div>
+
       <div class="slide s-sum" data-slide="summary">
         <div class="sum-inner">
           <div class="sum-tag-row"><div class="tag">Research Log</div></div>
@@ -549,140 +694,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       </div>
     </div>
 
-    <div id="wedgeView">
-
-      <div class="w-slide" data-wslide="wmag">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 1 of 5</span><span style="font-size:11px;color:var(--danger);font-weight:700">Required</span></div>
-          <h2 class="w-title">How valuable would this actually be?</h2>
-          <div class="w-coach"><span class="w-coach-tag">Ask</span>"<span id="magCoach">If we could realistically recover that revenue</span> for you — how meaningful would that be? Scale of 1 to 10, where 10 means it would transform your clinic."</div>
-          <div class="mag-display" id="magDisp">5</div>
-          <div class="mag-slider-wrap"><input type="range" id="magSlider" min="1" max="10" value="5" oninput="onMagSlider(this.value)"/><div class="mag-anchor-row"><span>1 · Not meaningful</span><span>5 · Useful</span><span>10 · Transform</span></div></div>
-          <div class="field-wrap"><label>In their words — what would they do with that recovered revenue? <span class="req">*</span></label><textarea id="magQuote" placeholder='e.g. "I&apos;d hire two more therapists"' oninput="onWedgeInput('magnitude.quote',this.value)"></textarea></div>
-          <div class="w-must">Required — magnitude is the foundation of the wedge.</div>
-        </div>
-      </div>
-
-      <div class="w-slide" data-wslide="wsub">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 2 of 5</span><span class="skip-link" onclick="skipWedgeSlide()">Skip this slide</span></div>
-          <h2 class="w-title">The trade-off test</h2>
-          <div class="subgroup">
-            <div class="subgroup-lbl">Substitution</div>
-            <div class="w-coach"><span class="w-coach-tag">Ask</span>"If you had ₹15,000/month for either a part-time receptionist for follow-up OR our platform at ₹5,000/month — which would you pick? Be honest."</div>
-            <div class="radio-group">
-              <div class="radio-opt" data-sub="platform" onclick="setSubChoice('platform')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Picks the platform</div><span class="signal-tag sig-green">Strong</span><span class="sig-pts">10</span></div>
-              <div class="radio-opt" data-sub="hesitates" onclick="setSubChoice('hesitates')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Hesitates or depends</div><span class="signal-tag sig-yellow">Mixed</span><span class="sig-pts">5</span></div>
-              <div class="radio-opt" data-sub="status_quo" onclick="setSubChoice('status_quo')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Receptionist / status quo</div><span class="signal-tag sig-red">Weak</span><span class="sig-pts">0</span></div>
-            </div>
-            <div class="field-wrap"><label>Why? Capture verbatim</label><input type="text" id="subReason" placeholder="Their exact words" oninput="onWedgeInput('substitution.reason',this.value)"/></div>
-          </div>
-          <div class="subgroup" style="margin-top:14px">
-            <div class="subgroup-lbl">Urgency</div>
-            <div class="w-coach"><span class="w-coach-tag">Ask</span>"If you decided to do this, when would you actually want it up and running?"</div>
-            <div class="radio-group">
-              <div class="radio-opt" data-urg="this_month" onclick="setUrgency('this_month')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">This month</div><span class="sig-pts">10</span></div>
-              <div class="radio-opt" data-urg="this_quarter" onclick="setUrgency('this_quarter')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">This quarter</div><span class="sig-pts">7</span></div>
-              <div class="radio-opt" data-urg="this_year" onclick="setUrgency('this_year')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Sometime this year</div><span class="sig-pts">3</span></div>
-              <div class="radio-opt" data-urg="not_priority" onclick="setUrgency('not_priority')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Not a priority right now</div><span class="sig-pts">0</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-slide" data-wslide="wwallet">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 3 of 5</span><span class="skip-link" onclick="skipWedgeSlide()">Skip this slide</span></div>
-          <h2 class="w-title">What would feel reasonable?</h2>
-          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Magic button. Tell me a price per month where you'd <strong>instantly say yes</strong> — no thinking. And one where you'd <strong>instantly say no</strong> — too much."</div>
-          <div class="wallet-card wallet-yes">
-            <div class="wallet-card-hdr"><span class="wallet-card-lbl yes-c">Instant YES · ₹/month</span><span class="wallet-display yes-c" id="walletYesDisp">₹3,000</span></div>
-            <input type="range" id="walletYes" min="500" max="20000" step="500" value="3000" oninput="onWalletYes(this.value)"/>
-            <div class="sl-bounds"><span>₹500</span><span>₹20,000</span></div>
-          </div>
-          <div class="wallet-card wallet-no">
-            <div class="wallet-card-hdr"><span class="wallet-card-lbl no-c">Instant NO · ₹/month</span><span class="wallet-display no-c" id="walletNoDisp">₹15,000</span></div>
-            <input type="range" id="walletNo" min="1000" max="50000" step="1000" value="15000" oninput="onWalletNo(this.value)"/>
-            <div class="sl-bounds"><span>₹1,000</span><span>₹50,000</span></div>
-            <div class="wallet-err" id="walletErr">NO must be ≥ YES.</div>
-          </div>
-          <div class="wallet-window">
-            <div class="ww-line"><span class="wk">Pricing window</span><span class="wv" id="wwRange">₹3,000 – ₹15,000</span></div>
-            <div class="ww-line"><span class="wk">Comfortable midpoint</span><span class="wv" id="wwMid">₹9,000</span></div>
-            <div class="ww-line"><span class="wk">Window width</span><span class="wv" id="wwWidth">₹12,000</span></div>
-            <div class="ww-class" id="wwClass">Wide — strong demand</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-slide" data-wslide="wcommit">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 4 of 5</span><span style="font-size:11px;color:var(--danger);font-weight:700">Reaction required</span></div>
-          <h2 class="w-title">What would they commit to today?</h2>
-          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Three quick yes/nos: (a) Could you introduce me to peer clinics? (b) Would you pilot this 60 days free with 10 patients? (c) If it works, would you write a testimonial?"<div style="margin-top:6px;color:var(--text);font-style:normal;font-weight:600;font-size:11px">Capture their reaction — not just their words. Hesitation matters.</div></div>
-          <div class="check-group">
-            <div class="check-opt" data-c="intro"><div class="check-hdr" onclick="toggleCommit('intro')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Will introduce me to peer clinics</div></div><div class="check-sub"><input type="text" id="introNames" placeholder="Names mentioned" oninput="onWedgeInput('commitment.introNames',this.value)"/></div></div>
-            <div class="check-opt" data-c="pilot"><div class="check-hdr" onclick="toggleCommit('pilot')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Willing to pilot — 60 days, 10 patients</div></div><div class="check-sub"><input type="text" id="pilotConds" placeholder="Conditions? e.g. 'only if it does X'" oninput="onWedgeInput('commitment.pilotConds',this.value)"/></div></div>
-            <div class="check-opt" data-c="testimonial"><div class="check-hdr" onclick="toggleCommit('testimonial')"><div class="check-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-lbl">Will write a testimonial if it works</div></div><div class="check-sub"><input type="text" id="testimonialNotes" placeholder="Notes" oninput="onWedgeInput('commitment.testimonialNotes',this.value)"/></div></div>
-          </div>
-          <div class="subgroup" style="margin-top:14px">
-            <div class="subgroup-lbl">Their reaction <span class="req">*</span></div>
-            <div class="radio-group">
-              <div class="radio-opt" data-rxn="enthusiastic" onclick="setReaction('enthusiastic')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Enthusiastic</div><span class="signal-tag sig-green">Strong</span></div>
-              <div class="radio-opt" data-rxn="cautious" onclick="setReaction('cautious')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Cautious</div><span class="signal-tag sig-yellow">Mixed</span></div>
-              <div class="radio-opt" data-rxn="hesitant" onclick="setReaction('hesitant')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Hesitant</div><span class="signal-tag sig-yellow">Watch</span></div>
-              <div class="radio-opt" data-rxn="declined" onclick="setReaction('declined')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Declined</div><span class="signal-tag sig-red">Weak</span></div>
-            </div>
-            <div class="field-wrap"><label>What did they actually say or do?</label><input type="text" id="reactionNote" placeholder="Body language, exact words…" oninput="onWedgeInput('commitment.reactionNote',this.value)"/></div>
-          </div>
-          <div class="w-must">Reaction is required — silence is data.</div>
-        </div>
-      </div>
-
-      <div class="w-slide" data-wslide="wloi">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Wedge · Slide 5 of 5</span><span class="skip-link" onclick="skipWedgeSlide()">Skip this slide</span></div>
-          <h2 class="w-title">Would they sign an LOI this week?</h2>
-          <div class="w-coach"><span class="w-coach-tag">Ask</span>"I'll send you a one-page Letter of Intent — non-binding. Says you'd pilot 60 days free with 10 patients in exchange for early-partner pricing. Would you sign it this week?"</div>
-          <div class="subgroup-lbl">Their response</div>
-          <div class="radio-group">
-            <div class="radio-opt" data-loi="yes_now" onclick="setLoi('yes_now')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Yes — send it now</div><span class="signal-tag sig-green">Strong</span><span class="sig-pts">10</span></div>
-            <div class="radio-opt" data-loi="probably" onclick="setLoi('probably')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Send it, I'll review and probably sign</div><span class="signal-tag sig-yellow">Probable</span><span class="sig-pts">7</span></div>
-            <div class="radio-opt" data-loi="maybe" onclick="setLoi('maybe')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Send it, I'll think about it</div><span class="signal-tag sig-yellow">Weak</span><span class="sig-pts">3</span></div>
-            <div class="radio-opt" data-loi="wait" onclick="setLoi('wait')"><div class="radio-opt-dot"></div><div class="radio-opt-lbl">Wait until you've built something</div><span class="signal-tag sig-red">Not yet</span><span class="sig-pts">0</span></div>
-          </div>
-          <div class="subgroup" style="margin-top:12px">
-            <div class="subgroup-lbl">How hesitant did they seem?</div>
-            <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--muted)">None</span><input type="range" id="hesSlider" min="1" max="5" value="3" oninput="onHesSlider(this.value)" style="flex:1"/><span style="font-size:11px;color:var(--muted)">Heavy</span><span class="sl-val" id="hesVal">3</span></div>
-          </div>
-          <div class="field-wrap"><label>Exact words and body language</label><textarea id="loiQuote" placeholder='e.g. "She paused, then said send it. Added me on WhatsApp."' oninput="onWedgeInput('loi.quote',this.value)"></textarea></div>
-          <div class="field-wrap"><label>Promised follow-up date</label><input type="date" id="loiDate" oninput="onWedgeInput('loi.followupDate',this.value)"/></div>
-          <div style="text-align:center"><button class="wedge-primary" onclick="goWedgeSlide('wasym')">Complete Wedge Test<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button></div>
-        </div>
-      </div>
-
-      <div class="w-slide" data-wslide="wasym">
-        <div class="w-inner">
-          <div class="w-top-bar"><span class="w-eyebrow">Asymmetric · Bonus</span><span style="font-size:11px;color:var(--danger);font-weight:700">Required</span></div>
-          <h2 class="w-title">The strongest reason against</h2>
-          <div class="w-coach"><span class="w-coach-tag">Ask</span>"Pretend it worked exactly as described. What's the strongest reason you'd still <strong>not</strong> use it? Be brutal — your honesty here is more valuable than any praise."</div>
-          <div class="field-wrap"><label>Their objection — verbatim <span class="req">*</span></label><textarea id="asymObj" placeholder="At least one full sentence." oninput="onWedgeInput('asymmetric.objection',this.value)"></textarea></div>
-          <div class="subgroup-lbl" style="margin-top:12px">Category (multi-select)</div>
-          <div class="tag-sel" id="asymTags">
-            <span class="tag-sel-opt" data-tag="patient">Patient adoption</span>
-            <span class="tag-sel-opt" data-tag="team">Team adoption</span>
-            <span class="tag-sel-opt" data-tag="integration">Integration</span>
-            <span class="tag-sel-opt" data-tag="pricing">Pricing / budget</span>
-            <span class="tag-sel-opt" data-tag="trust">Trust / credibility</span>
-            <span class="tag-sel-opt" data-tag="priorities">Competing priorities</span>
-            <span class="tag-sel-opt" data-tag="other">Other</span>
-          </div>
-          <div style="text-align:center;margin-top:14px"><button class="wedge-primary" onclick="finishWedge()">See Wedge Score<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button></div>
-          <div class="w-must">Required — this is the most diagnostic question in the interview.</div>
-        </div>
-      </div>
-
-    </div>
 
   </div>
 
@@ -690,11 +701,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <button class="nav-arr next hidden" id="nextBtn" onclick="go(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button>
 
   <div class="tabbar">
-    <button class="tab-btn active" id="tabDeck" onclick="switchTab('deck')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Validation</button>
+    <button class="tab-btn active" id="tabDeck" onclick="switchTab('deck')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Interview</button>
     <div class="tab-divider"></div>
     <button class="tab-btn" id="tabRoi" onclick="switchTab('roi')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>ROI</button>
-    <div class="tab-divider"></div>
-    <button class="tab-btn" id="tabWedge" onclick="switchTab('wedge')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 22 22 22 12 2"/></svg>Wedge</button>
   </div>
 
   <div class="history-panel" id="histPanel">
@@ -743,7 +752,7 @@ function chooseSpecialty(sp){
   document.getElementById('logoSvg').setAttribute('stroke',sp==='derm'?'#fff':'#0A0F1E');
   document.querySelectorAll('.full-only').forEach(el=>el.style.display=quickMode?'none':'');
   document.querySelectorAll('.quick-only').forEach(el=>el.style.display=quickMode?'':'none');
-  document.getElementById('wedgeTotal').textContent=quickMode?'4':'5';
+  // Wedge total label now handled by combined slide counter
   const d=new Date();d.setDate(d.getDate()+7);
   document.getElementById('loiDate').value=d.toISOString().split('T')[0];
   wedge.loi.followupDate=document.getElementById('loiDate').value;
@@ -796,92 +805,86 @@ function resetWedgeUI(){
   document.getElementById('promisedField').value=wedge.promised;
 }
 
-function deckSlideOrder(){return quickMode?['wify','hook','painQuick','solution','dashboard','summary']:['wify','hook','pain1','pain2','pain3','solution','dashboard','summary'];}
-function wedgeSlideOrder(){return quickMode?['wmag','wwallet','wcommit','wloi','wasym']:['wmag','wsub','wwallet','wcommit','wloi','wasym'];}
+function deckSlideOrder(){
+  const wedge = quickMode?['wmag','wwallet','wcommit','wloi','wasym']:['wmag','wsub','wwallet','wcommit','wloi','wasym'];
+  const pain = quickMode?['painQuick']:['pain1','pain2','pain3'];
+  return ['wify','hook',...pain,'solution','dashboard',...wedge,'summary'];
+}
+function wedgeSlideOrder(){return [];}
+function phaseFor(slideName){
+  if(['wify','hook'].includes(slideName))return 'Setup';
+  if(['pain1','pain2','pain3','painQuick'].includes(slideName))return 'Validation';
+  if(['solution','dashboard'].includes(slideName))return 'Solution';
+  if(['wmag','wsub','wwallet','wcommit','wloi'].includes(slideName))return 'Wedge';
+  if(slideName==='wasym')return 'Asymmetric';
+  if(slideName==='summary')return 'Research Log';
+  return '';
+}
 
 function buildDots(){
   const total=deckSlideOrder().length;
-  const pd=document.getElementById('progDots');
-  pd.innerHTML='';
-  for(let i=0;i<total;i++){const d=document.createElement('div');d.className='prog-dot'+(i===0?' active':'');d.id='pd'+i;pd.appendChild(d);}
   document.getElementById('slideCtr').textContent=`1 / ${total}`;
 }
 
 function updateDots(){
   const total=deckSlideOrder().length;
-  for(let i=0;i<total;i++){const d=document.getElementById('pd'+i);if(d)d.className='prog-dot'+(i===curDeck?' active':i<curDeck?' visited':'');}
   document.getElementById('slideCtr').textContent=`${curDeck+1} / ${total}`;
+  const order=deckSlideOrder();
+  document.getElementById('phaseLabel').textContent=phaseFor(order[curDeck])||'';
 }
 
-function go(dir){const order=deckSlideOrder();const n=Math.max(0,Math.min(order.length-1,curDeck+dir));goSlide(order[n]);}
+function go(dir){
+  const order=deckSlideOrder();const cur=order[curDeck];
+  if(dir>0){
+    if(cur==='wmag'&&!wedge.magnitude.quote.trim())return flashRequired('magQuote','Capture what they would do with the recovered revenue.');
+    if(cur==='wcommit'&&!wedge.commitment.reaction)return flashRequired('reactionNote','Select their reaction — silence is data.');
+    if(cur==='wasym'&&wedge.asymmetric.objection.trim().length<10)return flashRequired('asymObj','Capture at least one full sentence.');
+  }
+  const n=Math.max(0,Math.min(order.length-1,curDeck+dir));goSlide(order[n]);
+}
 
 function goSlide(name){
   const order=deckSlideOrder();const n=order.indexOf(name);if(n<0)return;
   curDeck=n;
-  document.querySelectorAll('#deckView .slide').forEach(s=>{
+  document.querySelectorAll('#deckView .slide, #deckView .w-slide').forEach(s=>{
     const t=s.dataset.slide===name;s.classList.toggle('active',t);s.classList.toggle('left',!t);
   });
   document.getElementById('prevBtn').disabled=curDeck===0;
   document.getElementById('nextBtn').disabled=curDeck===order.length-1;
   updateDots();
   if(name==='summary')renderSummary();
-}
-
-function goWedge(dir){
-  const order=wedgeSlideOrder();const cur=order[curWedge];
-  if(dir>0){
-    if(cur==='wmag'&&!wedge.magnitude.quote.trim())return flashRequired('magQuote','Capture what they would do with the recovered revenue.');
-    if(cur==='wcommit'&&!wedge.commitment.reaction)return flashRequired('reactionNote','Select their reaction — silence is data.');
-    if(cur==='wasym'&&wedge.asymmetric.objection.trim().length<10)return flashRequired('asymObj','Capture at least one full sentence.');
-  }
-  const n=Math.max(0,Math.min(order.length-1,curWedge+dir));goWedgeSlide(order[n]);
-}
-
-function goWedgeSlide(name){
-  const order=wedgeSlideOrder();const n=order.indexOf(name);if(n<0)return;
-  curWedge=n;
-  document.querySelectorAll('#wedgeView .w-slide').forEach(s=>{
-    const t=s.dataset.wslide===name;s.classList.toggle('active',t);s.classList.toggle('left',!t);
-  });
-  document.getElementById('prevBtn').disabled=curWedge===0;
-  document.getElementById('nextBtn').disabled=curWedge===order.length-1;
-  document.getElementById('wedgeNum').textContent=name==='wasym'?'★':(n+1);
   if(name==='wmag')updateMagCoach();
 }
 
-function skipWedgeSlide(){const order=wedgeSlideOrder();if(curWedge<order.length-1)goWedgeSlide(order[curWedge+1]);}
-
 function flashRequired(id,msg){const el=document.getElementById(id);if(el){el.focus();el.style.borderColor='var(--danger)';setTimeout(()=>{el.style.borderColor='';},1500);}alert(msg);}
-
-function finishWedge(){
-  if(wedge.asymmetric.objection.trim().length<10)return flashRequired('asymObj','Capture at least one full sentence of objection.');
-  switchTab('deck');setTimeout(()=>goSlide('summary'),60);
-}
 
 function switchTab(tab){
   activeTab=tab;
   document.getElementById('deckView').classList.toggle('active',tab==='deck');
   document.getElementById('roiView').classList.toggle('active',tab==='roi');
-  document.getElementById('wedgeView').classList.toggle('active',tab==='wedge');
   document.getElementById('tabDeck').classList.toggle('active',tab==='deck');
   document.getElementById('tabRoi').classList.toggle('active',tab==='roi');
-  document.getElementById('tabWedge').classList.toggle('active',tab==='wedge');
   document.getElementById('deckTop').style.display=tab==='deck'?'flex':'none';
   document.getElementById('roiTop').style.display=tab==='roi'?'flex':'none';
-  document.getElementById('wedgeTop').style.display=tab==='wedge'?'flex':'none';
-  const showArrows=(tab==='deck'||tab==='wedge');
+  const showArrows=(tab==='deck');
   document.getElementById('prevBtn').classList.toggle('hidden',!showArrows);
   document.getElementById('nextBtn').classList.toggle('hidden',!showArrows);
   if(tab==='deck'){
-    document.getElementById('nextBtn').onclick=()=>go(1);
-    document.getElementById('prevBtn').onclick=()=>go(-1);
     document.getElementById('prevBtn').disabled=curDeck===0;
     document.getElementById('nextBtn').disabled=curDeck===deckSlideOrder().length-1;
-  }else if(tab==='wedge'){
-    document.getElementById('nextBtn').onclick=()=>goWedge(1);
-    document.getElementById('prevBtn').onclick=()=>goWedge(-1);
-    const order=wedgeSlideOrder();goWedgeSlide(order[curWedge]||order[0]);
   }else{calcCurrent();initSliders();}
+}
+
+function toggleCoach(){
+  const on = !document.body.classList.contains('coach-on');
+  document.body.classList.toggle('coach-on', on);
+  document.getElementById('coachToggleBtn').classList.toggle('on', on);
+  document.getElementById('coachLbl').textContent = on?'Prompts on':'Prompts';
+  // Update eye icon: open eye when on, struck-through when off
+  document.getElementById('coachEye').innerHTML = on
+    ? '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'
+    : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  try{localStorage.setItem('naaitya_coach_on', on?'1':'0');}catch{}
 }
 
 function setScore(p,v){
@@ -1215,6 +1218,13 @@ document.addEventListener('touchend',e=>{
 });
 
 updateCount();
+
+// Restore coach toggle state
+try{
+  if(localStorage.getItem('naaitya_coach_on')==='1'){
+    toggleCoach();
+  }
+}catch{}
 </script>
 </body>
 </html>
